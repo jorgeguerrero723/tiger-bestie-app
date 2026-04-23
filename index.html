@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tiger Bestie App 🐯</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #fff7ed, #fde68a);
+      margin: 0;
+      padding: 20px;
+    }
+    .card {
+      background: white;
+      border-radius: 20px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    button {
+      padding: 10px 15px;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    .primary {
+      background: black;
+      color: white;
+    }
+    .secondary {
+      background: #eee;
+    }
+    textarea, input {
+      width: 100%;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<h1>🐯 Tiger Bestie App</h1>
+
+<div class="card">
+  <h3>🎯 Mission of the Day</h3>
+  <p id="mission"></p>
+  <button onclick="newMission()">New Mission</button>
+</div>
+
+<div class="card">
+  <h3>😏 Smirk Counter</h3>
+  <p id="smirks">0</p>
+  <button class="primary" onclick="addSmirk()">Add Smirk</button>
+  <button class="secondary" onclick="resetSmirk()">Reset</button>
+</div>
+
+<div class="card">
+  <h3>📝 Your Note</h3>
+  <textarea id="note" placeholder="Write something..."></textarea>
+
+  <h3>💛 Gratitude</h3>
+  <input id="gratitude" placeholder="One thing you're grateful for"/>
+
+  <button class="primary" onclick="saveEntry()">Save</button>
+</div>
+
+<script>
+const missions = [
+  "Send one kind message today",
+  "Take a walk and reset your mind",
+  "Protect your peace",
+  "Write one thing you're proud of",
+  "Choose joy today",
+  "Keep the paw up"
+];
+
+let smirks = localStorage.getItem("smirks") || 0;
+document.getElementById("smirks").innerText = smirks;
+
+function addSmirk() {
+  smirks++;
+  localStorage.setItem("smirks", smirks);
+  document.getElementById("smirks").innerText = smirks;
+}
+
+function resetSmirk() {
+  smirks = 0;
+  localStorage.setItem("smirks", smirks);
+  document.getElementById("smirks").innerText = smirks;
+}
+
+function newMission() {
+  const m = missions[Math.floor(Math.random()*missions.length)];
+  document.getElementById("mission").innerText = m;
+}
+
+function saveEntry() {
+  localStorage.setItem("note", document.getElementById("note").value);
+  localStorage.setItem("gratitude", document.getElementById("gratitude").value);
+  alert("Saved, Tiger Bestie 🐯");
+}
+
+document.getElementById("note").value = localStorage.getItem("note") || "";
+document.getElementById("gratitude").value = localStorage.getItem("gratitude") || "";
+
+newMission();
+</script>
+
+</body>
+</html>
