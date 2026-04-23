@@ -1,392 +1,695 @@
-import { useEffect, useState } from "react";
-
-export default function PawMoodApp() {
-  const moods = [
-    {
-      name: "Paw Up",
-      emoji: "🐯",
-      message: "You’ve got Tiger energy today. Walk tall, protect the paw, and trust your spark.",
-    },
-    {
-      name: "Steady Paw",
-      emoji: "✨",
-      message: "You do not need to rush. A calm paw is still a powerful paw.",
-    },
-    {
-      name: "Legendary Paw",
-      emoji: "🔥",
-      message: "This is your moment. Bring the charisma, the heart, and the full Clemson glow.",
-    },
-    {
-      name: "Emergency Paw Protocol",
-      emoji: "🫶",
-      message: "Pause. Breathe in for 4, hold for 4, out for 6. Protect your peace first.",
-    },
-  ];
-
-  const [selected, setSelected] = useState(moods[0]);
-  const [note, setNote] = useState("");
-  const [smirks, setSmirks] = useState(0);
-  const [missionIndex, setMissionIndex] = useState(() => new Date().getDate() % 6);
-  const [customMission, setCustomMission] = useState("");
-  const [theme, setTheme] = useState("sunrise");
-  const [streak, setStreak] = useState(1);
-
-  const missions = [
-    "Send one kind message today.",
-    "Take a 10-minute walk and reset your mind.",
-    "Protect your peace in one difficult moment.",
-    "Write one thing you are proud of today.",
-    "Choose joy on purpose, even in a small way.",
-    "Drink water, breathe deep, and keep the paw up.",
-  ];
-
-  const pawQuotes = [
-    "Protect your peace. Protect the paw.",
-    "A steady paw is still a powerful paw.",
-    "Your joy is part of your strength.",
-    "Tiny steps still move the Tiger forward.",
-    "Kindness to yourself counts too.",
-    "Today is a good day to trust your spark.",
-  ];
-
-  const missionOptions = customMission.trim() ? [...missions, customMission.trim()] : missions;
-  const missionOfTheDay = missionOptions[missionIndex % missionOptions.length];
-  const pawQuote = pawQuotes[new Date().getDate() % pawQuotes.length];
-
-  useEffect(() => {
-    try {
-      const savedNote = localStorage.getItem("paw-note");
-      const savedSmirks = localStorage.getItem("paw-smirks");
-      const savedMood = localStorage.getItem("paw-mood");
-      const savedMissionIndex = localStorage.getItem("paw-mission-index");
-      const savedCustomMission = localStorage.getItem("paw-custom-mission");
-      const savedTheme = localStorage.getItem("paw-theme");
-      const savedStreak = localStorage.getItem("paw-streak");
-      const savedLastOpen = localStorage.getItem("paw-last-open");
-
-      if (savedNote) setNote(savedNote);
-      if (savedSmirks) setSmirks(Number(savedSmirks));
-      if (savedMood) {
-        const foundMood = moods.find((mood) => mood.name === savedMood);
-        if (foundMood) setSelected(foundMood);
-      }
-      if (savedMissionIndex !== null) setMissionIndex(Number(savedMissionIndex));
-      if (savedCustomMission) setCustomMission(savedCustomMission);
-      if (savedTheme) setTheme(savedTheme);
-      if (savedStreak) setStreak(Number(savedStreak));
-
-      const todayStamp = new Date().toDateString();
-      if (savedLastOpen !== todayStamp) {
-        if (savedLastOpen) {
-          const previous = new Date(savedLastOpen);
-          const todayDate = new Date(todayStamp);
-          const diffDays = Math.round((todayDate - previous) / (1000 * 60 * 60 * 24));
-          if (diffDays === 1) {
-            setStreak((current) => current + 1);
-          } else if (diffDays > 1) {
-            setStreak(1);
-          }
-        }
-        localStorage.setItem("paw-last-open", todayStamp);
-      }
-    } catch (error) {
-      console.log("Local storage unavailable", error);
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tiger Bestie App 🐯</title>
+  <meta name="theme-color" content="#f97316" />
+  <style>
+    :root {
+      --bg1: #fff7ed;
+      --bg2: #ffffff;
+      --bg3: #ffedd5;
+      --card: rgba(255,255,255,0.92);
+      --text: #0f172a;
+      --subtext: #475569;
+      --soft: #fed7aa;
+      --softText: #9a3412;
+      --border: rgba(15, 23, 42, 0.08);
+      --accent: #f97316;
+      --accent2: #fb923c;
+      --buttonText: white;
+      --preview: #f8fafc;
     }
-  }, []);
 
-  useEffect(() => {
-    try {
-      localStorage.setItem("paw-note", note);
-    } catch (error) {
-      console.log("Could not save note", error);
+    body.midnight {
+      --bg1: #020617;
+      --bg2: #0f172a;
+      --bg3: #1e293b;
+      --card: rgba(15,23,42,0.92);
+      --text: #f8fafc;
+      --subtext: #cbd5e1;
+      --soft: #1e293b;
+      --softText: #f8fafc;
+      --border: rgba(255,255,255,0.08);
+      --accent: #f97316;
+      --accent2: #fb923c;
+      --buttonText: white;
+      --preview: #1e293b;
     }
-  }, [note]);
 
-  useEffect(() => {
-    try {
-      localStorage.setItem("paw-smirks", String(smirks));
-    } catch (error) {
-      console.log("Could not save smirks", error);
+    body.forest {
+      --bg1: #ecfdf5;
+      --bg2: #ffffff;
+      --bg3: #dcfce7;
+      --card: rgba(255,255,255,0.92);
+      --text: #0f172a;
+      --subtext: #475569;
+      --soft: #d1fae5;
+      --softText: #065f46;
+      --border: rgba(15, 23, 42, 0.08);
+      --accent: #10b981;
+      --accent2: #34d399;
+      --buttonText: white;
+      --preview: #f0fdf4;
     }
-  }, [smirks]);
 
-  useEffect(() => {
-    try {
-      localStorage.setItem("paw-mood", selected.name);
-    } catch (error) {
-      console.log("Could not save mood", error);
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      color: var(--text);
+      background: linear-gradient(135deg, var(--bg1), var(--bg2), var(--bg3));
+      min-height: 100vh;
+      padding: 24px;
     }
-  }, [selected]);
 
-  useEffect(() => {
-    try {
-      localStorage.setItem("paw-mission-index", String(missionIndex));
-    } catch (error) {
-      console.log("Could not save mission", error);
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
     }
-  }, [missionIndex]);
 
-  useEffect(() => {
-    try {
-      localStorage.setItem("paw-custom-mission", customMission);
-    } catch (error) {
-      console.log("Could not save custom mission", error);
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 20px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+      backdrop-filter: blur(8px);
     }
-  }, [customMission]);
 
-  useEffect(() => {
-    try {
-      localStorage.setItem("paw-theme", theme);
-    } catch (error) {
-      console.log("Could not save theme", error);
+    .hero {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 16px;
+      margin-bottom: 24px;
     }
-  }, [theme]);
 
-  useEffect(() => {
-    try {
-      localStorage.setItem("paw-streak", String(streak));
-    } catch (error) {
-      console.log("Could not save streak", error);
+    .eyebrow {
+      font-size: 12px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: bold;
     }
-  }, [streak]);
 
-  const getRandomMission = () => {
-    if (missionOptions.length <= 1) return;
-    let nextIndex = Math.floor(Math.random() * missionOptions.length);
-    while (nextIndex === missionIndex) {
-      nextIndex = Math.floor(Math.random() * missionOptions.length);
+    h1, h2, h3, p {
+      margin: 0;
     }
-    setMissionIndex(nextIndex);
-  };
 
-  const themeStyles = {
-    sunrise: "from-orange-50 via-white to-orange-100",
-    midnight: "from-slate-950 via-slate-900 to-slate-800",
-    forest: "from-emerald-50 via-white to-green-100",
-  };
+    h1 {
+      font-size: 40px;
+      margin-top: 10px;
+    }
 
-  const cardStyles = {
-    sunrise: "bg-white/90 ring-black/5",
-    midnight: "bg-slate-900/90 text-white ring-white/10",
-    forest: "bg-white/90 ring-black/5",
-  };
+    .sub {
+      margin-top: 12px;
+      color: var(--subtext);
+      line-height: 1.5;
+    }
 
-  const softPanelStyles = {
-    sunrise: "bg-orange-100 text-orange-900",
-    midnight: "bg-slate-800 text-slate-100",
-    forest: "bg-emerald-100 text-emerald-900",
-  };
+    .badge {
+      background: var(--soft);
+      color: var(--softText);
+      border-radius: 18px;
+      padding: 12px 14px;
+      font-size: 14px;
+      font-weight: bold;
+      white-space: nowrap;
+    }
 
-  const textStyles = {
-    sunrise: "text-slate-900",
-    midnight: "text-white",
-    forest: "text-slate-900",
-  };
+    .grid {
+      display: grid;
+      gap: 20px;
+    }
 
-  const subtextStyles = {
-    sunrise: "text-slate-600",
-    midnight: "text-slate-300",
-    forest: "text-slate-600",
-  };
+    .grid-2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      margin-bottom: 20px;
+    }
 
-  const today = new Date().toLocaleDateString(undefined, {
-    weekday: "long",
-    month: "long",
-    day: "numeric",
-  });
+    .row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
 
-  return (
-    <div className={`min-h-screen bg-gradient-to-br ${themeStyles[theme]} p-6 md:p-10`}>
-      <div className="mx-auto max-w-4xl">
-        <div className={`mb-6 rounded-3xl p-6 shadow-lg ring-1 ${cardStyles[theme]}`}>
-          <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
-            <div>
-              <p className="text-sm uppercase tracking-[0.2em] text-orange-600">Mission: Protect the Paw</p>
-              <h1 className={`mt-2 text-3xl font-bold md:text-5xl ${textStyles[theme]}`}>Paw Mood App</h1>
-              <p className={`mt-3 max-w-2xl text-base md:text-lg ${subtextStyles[theme]}`}>
-                A tiny Tiger Bestie app to pick your vibe, reset your energy, and leave yourself a kind note.
-              </p>
-            </div>
-            <div className={`rounded-2xl px-4 py-3 text-sm font-medium ${softPanelStyles[theme]}`}>
-              {today}
-            </div>
+    button {
+      border: none;
+      border-radius: 16px;
+      padding: 12px 16px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: var(--buttonText);
+    }
+
+    .btn-dark {
+      background: #0f172a;
+      color: white;
+    }
+
+    .btn-light {
+      background: #e5e7eb;
+      color: #334155;
+    }
+
+    body.midnight .btn-light {
+      background: #334155;
+      color: #f8fafc;
+    }
+
+    .theme-btn.active {
+      outline: 2px solid var(--accent);
+    }
+
+    textarea, input {
+      width: 100%;
+      border-radius: 16px;
+      border: 1px solid #cbd5e1;
+      padding: 14px;
+      font-size: 14px;
+      margin-top: 8px;
+      background: white;
+      color: #0f172a;
+    }
+
+    body.midnight textarea,
+    body.midnight input {
+      background: #0f172a;
+      color: #f8fafc;
+      border-color: #334155;
+    }
+
+    label {
+      display: block;
+      margin-top: 16px;
+      margin-bottom: 4px;
+      font-size: 14px;
+      font-weight: bold;
+      color: var(--text);
+    }
+
+    .energy-box {
+      margin-top: 16px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: white;
+      border-radius: 24px;
+      padding: 22px;
+    }
+
+    .energy-emoji {
+      font-size: 48px;
+    }
+
+    .mood-option {
+      width: 100%;
+      text-align: left;
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 18px;
+      padding: 14px;
+      margin-top: 10px;
+      color: #0f172a;
+    }
+
+    .mood-option.active {
+      border: 2px solid var(--accent);
+      background: #fff7ed;
+    }
+
+    body.midnight .mood-option {
+      background: #0f172a;
+      color: #f8fafc;
+      border-color: #334155;
+    }
+
+    body.midnight .mood-option.active {
+      background: #1e293b;
+    }
+
+    .muted {
+      color: var(--subtext);
+      margin-top: 8px;
+      line-height: 1.5;
+    }
+
+    .big-number {
+      font-size: 32px;
+      font-weight: bold;
+      color: var(--text);
+    }
+
+    .preview {
+      margin-top: 16px;
+      background: var(--preview);
+      border-radius: 18px;
+      padding: 16px;
+    }
+
+    .history-item {
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 16px;
+      margin-top: 12px;
+      background: rgba(255,255,255,0.5);
+    }
+
+    body.midnight .history-item {
+      background: rgba(30,41,59,0.6);
+    }
+
+    .tiny {
+      font-size: 13px;
+      color: var(--subtext);
+    }
+
+    @media (max-width: 760px) {
+      body { padding: 16px; }
+      .hero { flex-direction: column; align-items: stretch; }
+      .grid-2 { grid-template-columns: 1fr; }
+      h1 { font-size: 32px; }
+    }
+  </style>
+</head>
+<body class="sunrise">
+  <div class="container">
+    <div class="card hero">
+      <div>
+        <div class="eyebrow">Mission: Protect the Paw</div>
+        <h1>Tiger Bestie App 🐯</h1>
+        <p class="sub">A tiny Tiger Bestie sanctuary to protect your energy, track your smirks, save sweet moments, and keep the paw up.</p>
+      </div>
+      <div class="badge" id="todayBadge"></div>
+    </div>
+
+    <div class="grid grid-2">
+      <div class="card">
+        <h2>Paw Quote of the Day</h2>
+        <p class="muted" id="quoteText"></p>
+      </div>
+
+      <div class="card">
+        <div class="row" style="justify-content: space-between; align-items: start;">
+          <div>
+            <h2>Paw Streak</h2>
+            <p class="muted">How many days in a row you visited your tiny Tiger sanctuary.</p>
           </div>
+          <div class="badge" id="streakValue">1</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Theme</h2>
+        <p class="muted">Choose the vibe of your paw world.</p>
+        <div class="row" style="margin-top: 14px;">
+          <button class="btn-light theme-btn" onclick="setTheme('sunrise')">Sunrise ☀️</button>
+          <button class="btn-light theme-btn" onclick="setTheme('midnight')">Midnight 🌙</button>
+          <button class="btn-light theme-btn" onclick="setTheme('forest')">Forest 🌿</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Custom Mission</h2>
+        <p class="muted">Write your own mission and it joins the rotation.</p>
+        <label for="customMission">Your custom mission</label>
+        <input id="customMission" placeholder="Example: Smile at myself and trust the day." />
+        <p class="tiny" id="customMissionPreview" style="margin-top: 10px;"></p>
+      </div>
+    </div>
+
+    <div class="grid grid-2">
+      <div class="card">
+        <div class="row" style="justify-content: space-between; align-items: start;">
+          <div>
+            <h2>Mission of the Day</h2>
+            <p class="muted" id="missionText"></p>
+          </div>
+          <div class="badge">Daily Paw</div>
+        </div>
+        <div class="row" style="margin-top: 14px;">
+          <button class="btn-primary" onclick="newMission()">New Mission 🎯</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="row" style="justify-content: space-between; align-items: start;">
+          <div>
+            <h2>Smirk Counter</h2>
+            <p class="muted">Track how many legendary smirks happen today.</p>
+          </div>
+          <div class="big-number" id="smirkValue">0</div>
+        </div>
+        <div class="row" style="margin-top: 14px;">
+          <button class="btn-dark" onclick="addSmirk()">Add Smirk 😏</button>
+          <button class="btn-light" onclick="resetSmirk()">Reset</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Choose Your Paw Mode</h2>
+        <div id="moodList"></div>
+      </div>
+
+      <div class="card">
+        <h2>Your Current Energy</h2>
+        <div class="energy-box">
+          <div class="energy-emoji" id="energyEmoji">🐯</div>
+          <h2 style="margin-top: 10px;" id="energyName">Paw Up</h2>
+          <p style="margin-top: 12px; line-height: 1.6;" id="energyMessage"></p>
         </div>
 
-        <div className="mb-6 grid gap-6 md:grid-cols-2">
-          <div className={`rounded-3xl p-6 shadow-lg ring-1 ${cardStyles[theme]}`}>
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <h2 className={`text-xl font-semibold ${textStyles[theme]}`}>Paw quote of the day</h2>
-                <p className={`mt-2 ${subtextStyles[theme]}`}>{pawQuote}</p>
-              </div>
-              <div className={`rounded-2xl px-3 py-2 text-sm font-semibold ${softPanelStyles[theme]}`}>
-                Daily Quote
-              </div>
-            </div>
-          </div>
+        <label for="note">Leave yourself a note</label>
+        <textarea id="note" rows="5" placeholder="Example: Today I protect my peace and keep the paw up."></textarea>
 
-          <div className={`rounded-3xl p-6 shadow-lg ring-1 ${cardStyles[theme]}`}>
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <h2 className={`text-xl font-semibold ${textStyles[theme]}`}>Paw streak</h2>
-                <p className={`mt-2 ${subtextStyles[theme]}`}>How many days in a row you visited your tiny Tiger sanctuary.</p>
-              </div>
-              <div className={`rounded-2xl px-4 py-3 text-2xl font-bold ${softPanelStyles[theme]}`}>
-                {streak}
-              </div>
-            </div>
-          </div>
+        <label for="gratitude">One thing you are grateful for today</label>
+        <input id="gratitude" placeholder="Example: A good coffee, a kind friend, a peaceful moment." />
 
-          <div className={`rounded-3xl p-6 shadow-lg ring-1 ${cardStyles[theme]}`}>
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <h2 className={`text-xl font-semibold ${textStyles[theme]}`}>Theme</h2>
-                <p className={`mt-2 ${subtextStyles[theme]}`}>Choose the vibe of your paw world.</p>
-              </div>
-            </div>
-            <div className="mt-4 flex flex-wrap gap-3">
-              {[
-                { key: "sunrise", label: "Sunrise ☀️" },
-                { key: "midnight", label: "Midnight 🌙" },
-                { key: "forest", label: "Forest 🌿" },
-              ].map((option) => (
-                <button
-                  key={option.key}
-                  onClick={() => setTheme(option.key)}
-                  className={`rounded-2xl border px-4 py-3 font-medium transition ${
-                    theme === option.key
-                      ? "border-orange-500 bg-orange-50 text-slate-900"
-                      : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
-                  }`}
-                >
-                  {option.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className={`rounded-3xl p-6 shadow-lg ring-1 ${cardStyles[theme]}`}>
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <h2 className={`text-xl font-semibold ${textStyles[theme]}`}>Custom mission</h2>
-                <p className={`mt-2 ${subtextStyles[theme]}`}>Write your own mission and it joins the rotation.</p>
-              </div>
-            </div>
-            <div className="mt-4 flex flex-col gap-3">
-              <input
-                value={customMission}
-                onChange={(e) => setCustomMission(e.target.value)}
-                placeholder="Example: Smile at myself and trust the day."
-                className="w-full rounded-2xl border border-slate-200 p-4 text-slate-800 outline-none ring-0 transition focus:border-orange-400"
-              />
-              <p className={`text-sm ${subtextStyles[theme]}`}>
-                {customMission.trim() ? `Current custom mission: ${customMission}` : "No custom mission yet."}
-              </p>
-            </div>
-          </div>
-          <div className={`rounded-3xl p-6 shadow-lg ring-1 ${cardStyles[theme]}`}>
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <h2 className={`text-xl font-semibold ${textStyles[theme]}`}>Mission of the day</h2>
-                <p className={`mt-2 ${subtextStyles[theme]}`}>{missionOfTheDay}</p>
-              </div>
-              <div className={`rounded-2xl px-3 py-2 text-sm font-semibold ${softPanelStyles[theme]}`}>
-                Daily Paw
-              </div>
-            </div>
-            <div className="mt-4">
-              <button
-                onClick={getRandomMission}
-                className="rounded-2xl bg-orange-500 px-4 py-3 font-medium text-white transition hover:scale-[1.01]"
-              >
-                New Mission 🎯
-              </button>
-            </div>
-          </div>
-
-          <div className={`rounded-3xl p-6 shadow-lg ring-1 ${cardStyles[theme]}`}>
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <h2 className={`text-xl font-semibold ${textStyles[theme]}`}>Smirk counter</h2>
-                <p className={`mt-2 ${subtextStyles[theme]}`}>Track how many legendary smirks happen today.</p>
-              </div>
-              <div className={`text-3xl font-bold ${textStyles[theme]}`}>{smirks}</div>
-            </div>
-            <div className="mt-4 flex gap-3">
-              <button
-                onClick={() => setSmirks((s) => s + 1)}
-                className="rounded-2xl bg-slate-900 px-4 py-3 font-medium text-white transition hover:scale-[1.01]"
-              >
-                Add Smirk 😏
-              </button>
-              <button
-                onClick={() => setSmirks(0)}
-                className="rounded-2xl border border-slate-200 px-4 py-3 font-medium text-slate-700 transition hover:bg-slate-50"
-              >
-                Reset
-              </button>
-            </div>
-          </div>
+        <div class="preview">
+          <h3>Preview</h3>
+          <p class="muted" id="notePreview" style="margin-top: 10px;"></p>
+          <p class="tiny" id="gratitudePreview" style="margin-top: 12px;"></p>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2">
-          <div className="rounded-3xl bg-white p-6 shadow-lg ring-1 ring-black/5">
-            <h2 className={`text-xl font-semibold ${textStyles[theme]}`}>Choose your paw mode</h2>
-            <div className="mt-4 grid gap-3">
-              {moods.map((mood) => {
-                const active = selected.name === mood.name;
-                return (
-                  <button
-                    key={mood.name}
-                    onClick={() => setSelected(mood)}
-                    className={`rounded-2xl border p-4 text-left transition-all ${
-                      active
-                        ? "border-orange-500 bg-orange-50 shadow-md"
-                        : "border-slate-200 bg-white hover:border-orange-300 hover:bg-orange-50/50"
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <span className="text-2xl">{mood.emoji}</span>
-                      <div>
-                        <div className="font-semibold text-slate-900">{mood.name}</div>
-                        <div className="text-sm text-slate-500">Tap to activate this vibe</div>
-                      </div>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          <div className="rounded-3xl bg-white p-6 shadow-lg ring-1 ring-black/5">
-            <h2 className={`text-xl font-semibold ${textStyles[theme]}`}>Your current energy</h2>
-            <div className="mt-4 rounded-3xl bg-gradient-to-br from-orange-500 to-amber-400 p-6 text-white shadow-lg">
-              <div className="text-5xl">{selected.emoji}</div>
-              <div className="mt-3 text-2xl font-bold">{selected.name}</div>
-              <p className="mt-3 text-base leading-7 text-white/95">{selected.message}</p>
-            </div>
-
-            <div className="mt-6">
-              <label className={`mb-2 block text-sm font-medium ${theme === "midnight" ? "text-slate-200" : "text-slate-700"}`}>Leave yourself a note</label>
-              <textarea
-                value={note}
-                onChange={(e) => setNote(e.target.value)}
-                placeholder="Example: Today I protect my peace and keep the paw up."
-                className="min-h-[120px] w-full rounded-2xl border border-slate-200 p-4 text-slate-800 outline-none ring-0 transition focus:border-orange-400"
-              />
-            </div>
-
-            <div className={`mt-4 rounded-2xl p-4 ${theme === "midnight" ? "bg-slate-800" : "bg-slate-50"}`}>
-              <div className={`text-sm font-semibold ${theme === "midnight" ? "text-slate-200" : "text-slate-700"}`}>Preview</div>
-              <p className={`mt-2 ${subtextStyles[theme]}`}>
-                {note || "Your note will appear here once you write something, Tiger Bestie."}
-              </p>
-            </div>
-          </div>
+        <div class="row" style="margin-top: 14px;">
+          <button class="btn-dark" onclick="saveEntry()">Save to Paw History 📘</button>
+          <button class="btn-light" onclick="shareEntry()">Share / Copy ✨</button>
         </div>
       </div>
     </div>
-  );
-}
+
+    <div class="card">
+      <div class="row" style="justify-content: space-between; align-items: start;">
+        <div>
+          <h2>Paw History</h2>
+          <p class="muted">Your latest saved Tiger Bestie moments.</p>
+        </div>
+        <div class="badge" id="historyCount">0 saved</div>
+      </div>
+      <div id="historyList" style="margin-top: 14px;"></div>
+    </div>
+  </div>
+
+  <script>
+    const moods = [
+      {
+        name: "Paw Up",
+        emoji: "🐯",
+        message: "You’ve got Tiger energy today. Walk tall, protect the paw, and trust your spark."
+      },
+      {
+        name: "Steady Paw",
+        emoji: "✨",
+        message: "You do not need to rush. A calm paw is still a powerful paw."
+      },
+      {
+        name: "Legendary Paw",
+        emoji: "🔥",
+        message: "This is your moment. Bring the charisma, the heart, and the full Clemson glow."
+      },
+      {
+        name: "Emergency Paw Protocol",
+        emoji: "🫶",
+        message: "Pause. Breathe in for 4, hold for 4, out for 6. Protect your peace first."
+      }
+    ];
+
+    const baseMissions = [
+      "Send one kind message today.",
+      "Take a 10-minute walk and reset your mind.",
+      "Protect your peace in one difficult moment.",
+      "Write one thing you are proud of today.",
+      "Choose joy on purpose, even in a small way.",
+      "Drink water, breathe deep, and keep the paw up."
+    ];
+
+    const pawQuotes = [
+      "Protect your peace. Protect the paw.",
+      "A steady paw is still a powerful paw.",
+      "Your joy is part of your strength.",
+      "Tiny steps still move the Tiger forward.",
+      "Kindness to yourself counts too.",
+      "Today is a good day to trust your spark."
+    ];
+
+    let selectedMoodName = localStorage.getItem("paw-mood") || moods[0].name;
+    let note = localStorage.getItem("paw-note") || "";
+    let gratitude = localStorage.getItem("paw-gratitude") || "";
+    let smirks = Number(localStorage.getItem("paw-smirks") || 0);
+    let customMission = localStorage.getItem("paw-custom-mission") || "";
+    let theme = localStorage.getItem("paw-theme") || "sunrise";
+    let missionIndex = Number(localStorage.getItem("paw-mission-index") || 0);
+    let history = JSON.parse(localStorage.getItem("paw-history") || "[]");
+    let streak = Number(localStorage.getItem("paw-streak") || 1);
+
+    function todayDate() {
+      return new Date().toLocaleDateString(undefined, {
+        weekday: "long",
+        month: "long",
+        day: "numeric"
+      });
+    }
+
+    function todayKey() {
+      return new Date().toLocaleDateString(undefined, {
+        year: "numeric",
+        month: "short",
+        day: "numeric"
+      });
+    }
+
+    function updateStreak() {
+      const todayStamp = new Date().toDateString();
+      const savedLastOpen = localStorage.getItem("paw-last-open");
+
+      if (savedLastOpen !== todayStamp) {
+        if (savedLastOpen) {
+          const previous = new Date(savedLastOpen);
+          const today = new Date(todayStamp);
+          const diffDays = Math.round((today - previous) / (1000 * 60 * 60 * 24));
+
+          if (diffDays === 1) {
+            streak += 1;
+          } else if (diffDays > 1) {
+            streak = 1;
+          }
+        } else {
+          streak = 1;
+        }
+        localStorage.setItem("paw-last-open", todayStamp);
+        localStorage.setItem("paw-streak", String(streak));
+      }
+    }
+
+    function getMissionOptions() {
+      const trimmed = customMission.trim();
+      return trimmed ? [...baseMissions, trimmed] : baseMissions;
+    }
+
+    function getSelectedMood() {
+      return moods.find(m => m.name === selectedMoodName) || moods[0];
+    }
+
+    function renderMoods() {
+      const list = document.getElementById("moodList");
+      list.innerHTML = "";
+      moods.forEach(mood => {
+        const btn = document.createElement("button");
+        btn.className = "mood-option" + (mood.name === selectedMoodName ? " active" : "");
+        btn.innerHTML = `
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div style="font-size:28px;">${mood.emoji}</div>
+            <div>
+              <div style="font-weight:bold;">${mood.name}</div>
+              <div style="font-size:13px; color:#64748b; margin-top:4px;">Tap to activate this vibe</div>
+            </div>
+          </div>
+        `;
+        btn.onclick = () => {
+          selectedMoodName = mood.name;
+          localStorage.setItem("paw-mood", selectedMoodName);
+          render();
+        };
+        list.appendChild(btn);
+      });
+    }
+
+    function renderEnergy() {
+      const mood = getSelectedMood();
+      document.getElementById("energyEmoji").textContent = mood.emoji;
+      document.getElementById("energyName").textContent = mood.name;
+      document.getElementById("energyMessage").textContent = mood.message;
+    }
+
+    function renderMission() {
+      const missions = getMissionOptions();
+      if (missionIndex >= missions.length) {
+        missionIndex = 0;
+      }
+      document.getElementById("missionText").textContent = missions[missionIndex];
+      localStorage.setItem("paw-mission-index", String(missionIndex));
+    }
+
+    function newMission() {
+      const missions = getMissionOptions();
+      if (missions.length <= 1) return;
+      let nextIndex = Math.floor(Math.random() * missions.length);
+      while (nextIndex === missionIndex && missions.length > 1) {
+        nextIndex = Math.floor(Math.random() * missions.length);
+      }
+      missionIndex = nextIndex;
+      localStorage.setItem("paw-mission-index", String(missionIndex));
+      renderMission();
+    }
+
+    function addSmirk() {
+      smirks += 1;
+      localStorage.setItem("paw-smirks", String(smirks));
+      document.getElementById("smirkValue").textContent = smirks;
+    }
+
+    function resetSmirk() {
+      smirks = 0;
+      localStorage.setItem("paw-smirks", String(smirks));
+      document.getElementById("smirkValue").textContent = smirks;
+    }
+
+    function setTheme(nextTheme) {
+      theme = nextTheme;
+      localStorage.setItem("paw-theme", theme);
+      document.body.className = theme;
+      document.querySelectorAll(".theme-btn").forEach(btn => {
+        btn.classList.remove("active");
+      });
+      const labels = {
+        sunrise: "Sunrise ☀️",
+        midnight: "Midnight 🌙",
+        forest: "Forest 🌿"
+      };
+      document.querySelectorAll(".theme-btn").forEach(btn => {
+        if (btn.textContent.trim() === labels[theme]) {
+          btn.classList.add("active");
+        }
+      });
+    }
+
+    function updatePreview() {
+      note = document.getElementById("note").value;
+      gratitude = document.getElementById("gratitude").value;
+      localStorage.setItem("paw-note", note);
+      localStorage.setItem("paw-gratitude", gratitude);
+      document.getElementById("notePreview").textContent =
+        note || "Your note will appear here once you write something, Tiger Bestie.";
+      document.getElementById("gratitudePreview").textContent =
+        gratitude ? `Gratitude: ${gratitude}` : "Your gratitude line will appear here.";
+    }
+
+    function saveEntry() {
+      updatePreview();
+      if (!note.trim() && !gratitude.trim()) return;
+
+      const entry = {
+        date: todayKey(),
+        mood: selectedMoodName,
+        mission: getMissionOptions()[missionIndex],
+        note: note.trim(),
+        gratitude: gratitude.trim(),
+        smirks: smirks
+      };
+
+      history.unshift(entry);
+      history = history.slice(0, 7);
+      localStorage.setItem("paw-history", JSON.stringify(history));
+      renderHistory();
+      alert("Saved, Tiger Bestie 🐯");
+    }
+
+    async function shareEntry() {
+      updatePreview();
+      const message = [
+        `🐯 Paw Mood: ${selectedMoodName}`,
+        `🎯 Mission: ${getMissionOptions()[missionIndex]}`,
+        `😏 Smirks: ${smirks}`,
+        note ? `📝 Note: ${note}` : null,
+        gratitude ? `💛 Gratitude: ${gratitude}` : null
+      ].filter(Boolean).join("\n");
+
+      try {
+        if (navigator.share) {
+          await navigator.share({
+            title: "Tiger Bestie App",
+            text: message
+          });
+          return;
+        }
+        await navigator.clipboard.writeText(message);
+        alert("Your Paw entry was copied to the clipboard.");
+      } catch (e) {
+        console.log(e);
+      }
+    }
+
+    function renderHistory() {
+      const list = document.getElementById("historyList");
+      const count = document.getElementById("historyCount");
+      count.textContent = `${history.length} saved`;
+
+      if (history.length === 0) {
+        list.innerHTML = `<div class="history-item"><p class="muted">No saved entries yet. Save your first paw moment above.</p></div>`;
+        return;
+      }
+
+      list.innerHTML = history.map(entry => `
+        <div class="history-item">
+          <div class="tiny">${entry.date} • ${entry.mood} • ${entry.smirks} smirks</div>
+          <p style="margin-top:10px; font-weight:bold;">Mission: ${entry.mission}</p>
+          ${entry.note ? `<p style="margin-top:10px;">📝 ${entry.note}</p>` : ""}
+          ${entry.gratitude ? `<p class="muted" style="margin-top:10px;">💛 ${entry.gratitude}</p>` : ""}
+        </div>
+      `).join("");
+    }
+
+    function renderQuote() {
+      const index = new Date().getDate() % pawQuotes.length;
+      document.getElementById("quoteText").textContent = pawQuotes[index];
+    }
+
+    function render() {
+      document.getElementById("todayBadge").textContent = todayDate();
+      document.getElementById("streakValue").textContent = streak;
+      document.getElementById("smirkValue").textContent = smirks;
+      document.getElementById("customMission").value = customMission;
+      document.getElementById("customMissionPreview").textContent =
+        customMission.trim() ? `Current custom mission: ${customMission}` : "No custom mission yet.";
+      document.getElementById("note").value = note;
+      document.getElementById("gratitude").value = gratitude;
+      renderQuote();
+      renderMoods();
+      renderEnergy();
+      renderMission();
+      renderHistory();
+      updatePreview();
+      setTheme(theme);
+    }
+
+    document.getElementById("note").addEventListener("input", updatePreview);
+    document.getElementById("gratitude").addEventListener("input", updatePreview);
+    document.getElementById("customMission").addEventListener("input", (e) => {
+      customMission = e.target.value;
+      localStorage.setItem("paw-custom-mission", customMission);
+      document.getElementById("customMissionPreview").textContent =
+        customMission.trim() ? `Current custom mission: ${customMission}` : "No custom mission yet.";
+      renderMission();
+    });
+
+    updateStreak();
+    render();
+  </script>
+</body>
+</html>
