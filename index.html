@@ -1,114 +1,392 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Tiger Bestie App 🐯</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: linear-gradient(135deg, #fff7ed, #fde68a);
-      margin: 0;
-      padding: 20px;
+import { useEffect, useState } from "react";
+
+export default function PawMoodApp() {
+  const moods = [
+    {
+      name: "Paw Up",
+      emoji: "🐯",
+      message: "You’ve got Tiger energy today. Walk tall, protect the paw, and trust your spark.",
+    },
+    {
+      name: "Steady Paw",
+      emoji: "✨",
+      message: "You do not need to rush. A calm paw is still a powerful paw.",
+    },
+    {
+      name: "Legendary Paw",
+      emoji: "🔥",
+      message: "This is your moment. Bring the charisma, the heart, and the full Clemson glow.",
+    },
+    {
+      name: "Emergency Paw Protocol",
+      emoji: "🫶",
+      message: "Pause. Breathe in for 4, hold for 4, out for 6. Protect your peace first.",
+    },
+  ];
+
+  const [selected, setSelected] = useState(moods[0]);
+  const [note, setNote] = useState("");
+  const [smirks, setSmirks] = useState(0);
+  const [missionIndex, setMissionIndex] = useState(() => new Date().getDate() % 6);
+  const [customMission, setCustomMission] = useState("");
+  const [theme, setTheme] = useState("sunrise");
+  const [streak, setStreak] = useState(1);
+
+  const missions = [
+    "Send one kind message today.",
+    "Take a 10-minute walk and reset your mind.",
+    "Protect your peace in one difficult moment.",
+    "Write one thing you are proud of today.",
+    "Choose joy on purpose, even in a small way.",
+    "Drink water, breathe deep, and keep the paw up.",
+  ];
+
+  const pawQuotes = [
+    "Protect your peace. Protect the paw.",
+    "A steady paw is still a powerful paw.",
+    "Your joy is part of your strength.",
+    "Tiny steps still move the Tiger forward.",
+    "Kindness to yourself counts too.",
+    "Today is a good day to trust your spark.",
+  ];
+
+  const missionOptions = customMission.trim() ? [...missions, customMission.trim()] : missions;
+  const missionOfTheDay = missionOptions[missionIndex % missionOptions.length];
+  const pawQuote = pawQuotes[new Date().getDate() % pawQuotes.length];
+
+  useEffect(() => {
+    try {
+      const savedNote = localStorage.getItem("paw-note");
+      const savedSmirks = localStorage.getItem("paw-smirks");
+      const savedMood = localStorage.getItem("paw-mood");
+      const savedMissionIndex = localStorage.getItem("paw-mission-index");
+      const savedCustomMission = localStorage.getItem("paw-custom-mission");
+      const savedTheme = localStorage.getItem("paw-theme");
+      const savedStreak = localStorage.getItem("paw-streak");
+      const savedLastOpen = localStorage.getItem("paw-last-open");
+
+      if (savedNote) setNote(savedNote);
+      if (savedSmirks) setSmirks(Number(savedSmirks));
+      if (savedMood) {
+        const foundMood = moods.find((mood) => mood.name === savedMood);
+        if (foundMood) setSelected(foundMood);
+      }
+      if (savedMissionIndex !== null) setMissionIndex(Number(savedMissionIndex));
+      if (savedCustomMission) setCustomMission(savedCustomMission);
+      if (savedTheme) setTheme(savedTheme);
+      if (savedStreak) setStreak(Number(savedStreak));
+
+      const todayStamp = new Date().toDateString();
+      if (savedLastOpen !== todayStamp) {
+        if (savedLastOpen) {
+          const previous = new Date(savedLastOpen);
+          const todayDate = new Date(todayStamp);
+          const diffDays = Math.round((todayDate - previous) / (1000 * 60 * 60 * 24));
+          if (diffDays === 1) {
+            setStreak((current) => current + 1);
+          } else if (diffDays > 1) {
+            setStreak(1);
+          }
+        }
+        localStorage.setItem("paw-last-open", todayStamp);
+      }
+    } catch (error) {
+      console.log("Local storage unavailable", error);
     }
-    .card {
-      background: white;
-      border-radius: 20px;
-      padding: 20px;
-      margin-bottom: 20px;
-      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+  }, []);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem("paw-note", note);
+    } catch (error) {
+      console.log("Could not save note", error);
     }
-    button {
-      padding: 10px 15px;
-      border-radius: 12px;
-      border: none;
-      cursor: pointer;
-      margin-top: 10px;
+  }, [note]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem("paw-smirks", String(smirks));
+    } catch (error) {
+      console.log("Could not save smirks", error);
     }
-    .primary {
-      background: black;
-      color: white;
+  }, [smirks]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem("paw-mood", selected.name);
+    } catch (error) {
+      console.log("Could not save mood", error);
     }
-    .secondary {
-      background: #eee;
+  }, [selected]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem("paw-mission-index", String(missionIndex));
+    } catch (error) {
+      console.log("Could not save mission", error);
     }
-    textarea, input {
-      width: 100%;
-      padding: 10px;
-      border-radius: 10px;
-      border: 1px solid #ccc;
-      margin-top: 10px;
+  }, [missionIndex]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem("paw-custom-mission", customMission);
+    } catch (error) {
+      console.log("Could not save custom mission", error);
     }
-  </style>
-</head>
-<body>
+  }, [customMission]);
 
-<h1>🐯 Tiger Bestie App</h1>
+  useEffect(() => {
+    try {
+      localStorage.setItem("paw-theme", theme);
+    } catch (error) {
+      console.log("Could not save theme", error);
+    }
+  }, [theme]);
 
-<div class="card">
-  <h3>🎯 Mission of the Day</h3>
-  <p id="mission"></p>
-  <button onclick="newMission()">New Mission</button>
-</div>
+  useEffect(() => {
+    try {
+      localStorage.setItem("paw-streak", String(streak));
+    } catch (error) {
+      console.log("Could not save streak", error);
+    }
+  }, [streak]);
 
-<div class="card">
-  <h3>😏 Smirk Counter</h3>
-  <p id="smirks">0</p>
-  <button class="primary" onclick="addSmirk()">Add Smirk</button>
-  <button class="secondary" onclick="resetSmirk()">Reset</button>
-</div>
+  const getRandomMission = () => {
+    if (missionOptions.length <= 1) return;
+    let nextIndex = Math.floor(Math.random() * missionOptions.length);
+    while (nextIndex === missionIndex) {
+      nextIndex = Math.floor(Math.random() * missionOptions.length);
+    }
+    setMissionIndex(nextIndex);
+  };
 
-<div class="card">
-  <h3>📝 Your Note</h3>
-  <textarea id="note" placeholder="Write something..."></textarea>
+  const themeStyles = {
+    sunrise: "from-orange-50 via-white to-orange-100",
+    midnight: "from-slate-950 via-slate-900 to-slate-800",
+    forest: "from-emerald-50 via-white to-green-100",
+  };
 
-  <h3>💛 Gratitude</h3>
-  <input id="gratitude" placeholder="One thing you're grateful for"/>
+  const cardStyles = {
+    sunrise: "bg-white/90 ring-black/5",
+    midnight: "bg-slate-900/90 text-white ring-white/10",
+    forest: "bg-white/90 ring-black/5",
+  };
 
-  <button class="primary" onclick="saveEntry()">Save</button>
-</div>
+  const softPanelStyles = {
+    sunrise: "bg-orange-100 text-orange-900",
+    midnight: "bg-slate-800 text-slate-100",
+    forest: "bg-emerald-100 text-emerald-900",
+  };
 
-<script>
-const missions = [
-  "Send one kind message today",
-  "Take a walk and reset your mind",
-  "Protect your peace",
-  "Write one thing you're proud of",
-  "Choose joy today",
-  "Keep the paw up"
-];
+  const textStyles = {
+    sunrise: "text-slate-900",
+    midnight: "text-white",
+    forest: "text-slate-900",
+  };
 
-let smirks = localStorage.getItem("smirks") || 0;
-document.getElementById("smirks").innerText = smirks;
+  const subtextStyles = {
+    sunrise: "text-slate-600",
+    midnight: "text-slate-300",
+    forest: "text-slate-600",
+  };
 
-function addSmirk() {
-  smirks++;
-  localStorage.setItem("smirks", smirks);
-  document.getElementById("smirks").innerText = smirks;
+  const today = new Date().toLocaleDateString(undefined, {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+  });
+
+  return (
+    <div className={`min-h-screen bg-gradient-to-br ${themeStyles[theme]} p-6 md:p-10`}>
+      <div className="mx-auto max-w-4xl">
+        <div className={`mb-6 rounded-3xl p-6 shadow-lg ring-1 ${cardStyles[theme]}`}>
+          <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+            <div>
+              <p className="text-sm uppercase tracking-[0.2em] text-orange-600">Mission: Protect the Paw</p>
+              <h1 className={`mt-2 text-3xl font-bold md:text-5xl ${textStyles[theme]}`}>Paw Mood App</h1>
+              <p className={`mt-3 max-w-2xl text-base md:text-lg ${subtextStyles[theme]}`}>
+                A tiny Tiger Bestie app to pick your vibe, reset your energy, and leave yourself a kind note.
+              </p>
+            </div>
+            <div className={`rounded-2xl px-4 py-3 text-sm font-medium ${softPanelStyles[theme]}`}>
+              {today}
+            </div>
+          </div>
+        </div>
+
+        <div className="mb-6 grid gap-6 md:grid-cols-2">
+          <div className={`rounded-3xl p-6 shadow-lg ring-1 ${cardStyles[theme]}`}>
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h2 className={`text-xl font-semibold ${textStyles[theme]}`}>Paw quote of the day</h2>
+                <p className={`mt-2 ${subtextStyles[theme]}`}>{pawQuote}</p>
+              </div>
+              <div className={`rounded-2xl px-3 py-2 text-sm font-semibold ${softPanelStyles[theme]}`}>
+                Daily Quote
+              </div>
+            </div>
+          </div>
+
+          <div className={`rounded-3xl p-6 shadow-lg ring-1 ${cardStyles[theme]}`}>
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h2 className={`text-xl font-semibold ${textStyles[theme]}`}>Paw streak</h2>
+                <p className={`mt-2 ${subtextStyles[theme]}`}>How many days in a row you visited your tiny Tiger sanctuary.</p>
+              </div>
+              <div className={`rounded-2xl px-4 py-3 text-2xl font-bold ${softPanelStyles[theme]}`}>
+                {streak}
+              </div>
+            </div>
+          </div>
+
+          <div className={`rounded-3xl p-6 shadow-lg ring-1 ${cardStyles[theme]}`}>
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h2 className={`text-xl font-semibold ${textStyles[theme]}`}>Theme</h2>
+                <p className={`mt-2 ${subtextStyles[theme]}`}>Choose the vibe of your paw world.</p>
+              </div>
+            </div>
+            <div className="mt-4 flex flex-wrap gap-3">
+              {[
+                { key: "sunrise", label: "Sunrise ☀️" },
+                { key: "midnight", label: "Midnight 🌙" },
+                { key: "forest", label: "Forest 🌿" },
+              ].map((option) => (
+                <button
+                  key={option.key}
+                  onClick={() => setTheme(option.key)}
+                  className={`rounded-2xl border px-4 py-3 font-medium transition ${
+                    theme === option.key
+                      ? "border-orange-500 bg-orange-50 text-slate-900"
+                      : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+                  }`}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className={`rounded-3xl p-6 shadow-lg ring-1 ${cardStyles[theme]}`}>
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h2 className={`text-xl font-semibold ${textStyles[theme]}`}>Custom mission</h2>
+                <p className={`mt-2 ${subtextStyles[theme]}`}>Write your own mission and it joins the rotation.</p>
+              </div>
+            </div>
+            <div className="mt-4 flex flex-col gap-3">
+              <input
+                value={customMission}
+                onChange={(e) => setCustomMission(e.target.value)}
+                placeholder="Example: Smile at myself and trust the day."
+                className="w-full rounded-2xl border border-slate-200 p-4 text-slate-800 outline-none ring-0 transition focus:border-orange-400"
+              />
+              <p className={`text-sm ${subtextStyles[theme]}`}>
+                {customMission.trim() ? `Current custom mission: ${customMission}` : "No custom mission yet."}
+              </p>
+            </div>
+          </div>
+          <div className={`rounded-3xl p-6 shadow-lg ring-1 ${cardStyles[theme]}`}>
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h2 className={`text-xl font-semibold ${textStyles[theme]}`}>Mission of the day</h2>
+                <p className={`mt-2 ${subtextStyles[theme]}`}>{missionOfTheDay}</p>
+              </div>
+              <div className={`rounded-2xl px-3 py-2 text-sm font-semibold ${softPanelStyles[theme]}`}>
+                Daily Paw
+              </div>
+            </div>
+            <div className="mt-4">
+              <button
+                onClick={getRandomMission}
+                className="rounded-2xl bg-orange-500 px-4 py-3 font-medium text-white transition hover:scale-[1.01]"
+              >
+                New Mission 🎯
+              </button>
+            </div>
+          </div>
+
+          <div className={`rounded-3xl p-6 shadow-lg ring-1 ${cardStyles[theme]}`}>
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h2 className={`text-xl font-semibold ${textStyles[theme]}`}>Smirk counter</h2>
+                <p className={`mt-2 ${subtextStyles[theme]}`}>Track how many legendary smirks happen today.</p>
+              </div>
+              <div className={`text-3xl font-bold ${textStyles[theme]}`}>{smirks}</div>
+            </div>
+            <div className="mt-4 flex gap-3">
+              <button
+                onClick={() => setSmirks((s) => s + 1)}
+                className="rounded-2xl bg-slate-900 px-4 py-3 font-medium text-white transition hover:scale-[1.01]"
+              >
+                Add Smirk 😏
+              </button>
+              <button
+                onClick={() => setSmirks(0)}
+                className="rounded-2xl border border-slate-200 px-4 py-3 font-medium text-slate-700 transition hover:bg-slate-50"
+              >
+                Reset
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid gap-6 md:grid-cols-2">
+          <div className="rounded-3xl bg-white p-6 shadow-lg ring-1 ring-black/5">
+            <h2 className={`text-xl font-semibold ${textStyles[theme]}`}>Choose your paw mode</h2>
+            <div className="mt-4 grid gap-3">
+              {moods.map((mood) => {
+                const active = selected.name === mood.name;
+                return (
+                  <button
+                    key={mood.name}
+                    onClick={() => setSelected(mood)}
+                    className={`rounded-2xl border p-4 text-left transition-all ${
+                      active
+                        ? "border-orange-500 bg-orange-50 shadow-md"
+                        : "border-slate-200 bg-white hover:border-orange-300 hover:bg-orange-50/50"
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="text-2xl">{mood.emoji}</span>
+                      <div>
+                        <div className="font-semibold text-slate-900">{mood.name}</div>
+                        <div className="text-sm text-slate-500">Tap to activate this vibe</div>
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="rounded-3xl bg-white p-6 shadow-lg ring-1 ring-black/5">
+            <h2 className={`text-xl font-semibold ${textStyles[theme]}`}>Your current energy</h2>
+            <div className="mt-4 rounded-3xl bg-gradient-to-br from-orange-500 to-amber-400 p-6 text-white shadow-lg">
+              <div className="text-5xl">{selected.emoji}</div>
+              <div className="mt-3 text-2xl font-bold">{selected.name}</div>
+              <p className="mt-3 text-base leading-7 text-white/95">{selected.message}</p>
+            </div>
+
+            <div className="mt-6">
+              <label className={`mb-2 block text-sm font-medium ${theme === "midnight" ? "text-slate-200" : "text-slate-700"}`}>Leave yourself a note</label>
+              <textarea
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                placeholder="Example: Today I protect my peace and keep the paw up."
+                className="min-h-[120px] w-full rounded-2xl border border-slate-200 p-4 text-slate-800 outline-none ring-0 transition focus:border-orange-400"
+              />
+            </div>
+
+            <div className={`mt-4 rounded-2xl p-4 ${theme === "midnight" ? "bg-slate-800" : "bg-slate-50"}`}>
+              <div className={`text-sm font-semibold ${theme === "midnight" ? "text-slate-200" : "text-slate-700"}`}>Preview</div>
+              <p className={`mt-2 ${subtextStyles[theme]}`}>
+                {note || "Your note will appear here once you write something, Tiger Bestie."}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
-
-function resetSmirk() {
-  smirks = 0;
-  localStorage.setItem("smirks", smirks);
-  document.getElementById("smirks").innerText = smirks;
-}
-
-function newMission() {
-  const m = missions[Math.floor(Math.random()*missions.length)];
-  document.getElementById("mission").innerText = m;
-}
-
-function saveEntry() {
-  localStorage.setItem("note", document.getElementById("note").value);
-  localStorage.setItem("gratitude", document.getElementById("gratitude").value);
-  alert("Saved, Tiger Bestie 🐯");
-}
-
-document.getElementById("note").value = localStorage.getItem("note") || "";
-document.getElementById("gratitude").value = localStorage.getItem("gratitude") || "";
-
-newMission();
-</script>
-
-</body>
-</html> 
